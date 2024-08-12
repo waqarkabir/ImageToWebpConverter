@@ -1,0 +1,11 @@
+@WebApi_HostAddress = http://localhost:5218
+
+POST {{WebApi_HostAddress}}/convert
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="files"; filename="vision.jpg"
+Content-Type: image/jpeg
+
+"C:\Users\waqar\Desktop\convert\vision.jpg"
+
