@@ -16,7 +16,11 @@ namespace WebApi.Controllers
         private readonly List<string> _permittedExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".bmp", ".gif" };
         private const long _fileSizeLimit = 2 * 1024 * 1024; // 2 MB limit for files
 
-        // POST: api/ImageConversion/Convert
+        /// <summary>
+        /// Converts the provided images to WebP format.
+        /// </summary>
+        /// <param name="files">The image files to convert.</param>
+        /// <returns>A list of converted images in WebP format.</returns>
         [HttpPost("convert")]
         public async Task<IActionResult> Convert(IFormFileCollection files)
         {
