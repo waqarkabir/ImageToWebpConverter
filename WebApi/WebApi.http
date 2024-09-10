@@ -1,11 +1,6 @@
-@WebApi_HostAddress = http://localhost:5218
+@WebAPI_HostAddress = http://localhost:5041
 
-POST {{WebApi_HostAddress}}/convert
-Content-Type: multipart/form-data
+GET {{WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
 
---boundary
-Content-Disposition: form-data; name="files"; filename="vision.jpg"
-Content-Type: image/jpeg
-
-"C:\Users\waqar\Desktop\convert\vision.jpg"
-
+###
