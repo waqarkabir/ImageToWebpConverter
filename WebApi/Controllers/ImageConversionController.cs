@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace WebApi.Controllers
 {
@@ -20,9 +21,9 @@ namespace WebApi.Controllers
         /// Converts the provided images to WebP format.
         /// </summary>
         /// <param name="files">The image files to convert.</param>
-        /// <returns>A list of converted images in WebP format.</returns>
+        /// <returns>A list of converted image file paths.</returns>
         [HttpPost("convert")]
-        public async Task<IActionResult> Convert(IFormFileCollection files)
+        public async Task<IActionResult> Convert([FromForm] List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
             {
@@ -44,9 +45,15 @@ namespace WebApi.Controllers
                     return BadRequest($"File {file.FileName} has an unsupported format.");
                 }
 
-                // Save the converted file to a temporary location (or return it as a byte array)
-                var convertedFilePath = await ConvertImageToWebP(file);
-                convertedFiles.Add(convertedFilePath);
+                try
+                {
+                    var convertedFilePath = await ConvertImageToWebP(file);
+                    convertedFiles.Add(convertedFilePath);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"Error converting {file.FileName}: {ex.Message}");
+                }
             }
 
             return Ok(new { ConvertedFiles = convertedFiles });
@@ -55,22 +62,23 @@ namespace WebApi.Controllers
         private async Task<string> ConvertImageToWebP(IFormFile file)
         {
             var tempPath = Path.GetTempPath();
-            var outputFilePath = Path.Combine(tempPath, Path.ChangeExtension(file.FileName, ".webp"));
+            var outputFilePath = Path.Combine(tempPath, Path.GetFileNameWithoutExtension(file.FileName) + ".webp");
 
             try
             {
                 using (var inputStream = file.OpenReadStream())
                 using (var image = await Image.LoadAsync(inputStream))
-                using (var outputStream = new FileStream(outputFilePath, FileMode.Create))
+                using (var outputStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
                 {
                     var encoder = new WebpEncoder();
                     await image.SaveAsync(outputStream, encoder);
                 }
+
                 return outputFilePath;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error converting {file.FileName}: {ex.Message}");
+                throw new Exception($"Error converting {file.FileName}: {ex.Message}", ex);
             }
         }
     }

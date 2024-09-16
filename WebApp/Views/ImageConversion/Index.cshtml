@@ -1,0 +1,6 @@
+﻿@model WebApp.Models.ImageConversionModel
+
+<form asp-action="Index" asp-controller="ImageConversion" method="post" enctype="multipart/form-data">
+    <input type="file" name="Files" multiple />
+    <button type="submit">Upload and Convert</button>
+</form>

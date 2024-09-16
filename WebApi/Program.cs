@@ -40,6 +40,7 @@ namespace WebAPI
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebP Image Conversion V1");
                     c.RoutePrefix = string.Empty; // To serve Swagger at the root URL
                 });
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
